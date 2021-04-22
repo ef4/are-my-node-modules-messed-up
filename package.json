@@ -1,6 +1,6 @@
 {
   "name": "are-my-node-modules-messed-up",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "repository": "https://github.com/ef4/are-my-node-modules-messed-up",
   "author": "Edward Faulkner <edward@eaf4.com>",
   "license": "MIT",
