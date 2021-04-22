@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 import { existsSync } from 'fs';
 import { readJSONSync } from 'fs-extra';
 import { dirname, sep } from 'path';
