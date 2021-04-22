@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "target": "es2018",
+    "module": "commonjs",
+    "declaration": true,
+    "typeRoots": ["node_modules/@types"],
+    "esModuleInterop": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "sourceMap": true,
+    "allowUnreachableCode": false,
+    "strict": true
+  },
+  "exclude": [
+    "node_modules"
+  ]
+}
