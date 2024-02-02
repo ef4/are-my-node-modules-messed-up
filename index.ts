@@ -6,6 +6,11 @@ import { dirname, sep } from 'path';
 import resolvePackagePath from 'resolve-package-path';
 import { satisfies } from 'semver';
 import chalk from 'chalk';
+import { findRoot } from "@manypkg/find-root";
+
+let CUSTOM_SETINGS;
+
+const IGNORE = ['webpack'];
 
 class Walker {
   errors: string[] = [];
@@ -41,7 +46,17 @@ class Walker {
     }
     for (let name of Object.keys(dependencies)) {
       let range = dependencies[name];
+
+      // Ignore workspace protocol
+      if (range.startsWith('workspace:')) continue;
+      // For package-aliases (due to bad-actors, etc)
+      if (range.startsWith('npm:') && range.includes('@')) {
+        let [, rangeOverride] = range.split('@');
+        range = rangeOverride;
+      }
+
       let version = this.checkDep(packageRoot, name);
+
       if (version) {
         if (!satisfies(version, range, { includePrerelease: true })) {
           this.errors.push(
@@ -51,6 +66,8 @@ class Walker {
           );
         }
       } else {
+        if (IGNORE.includes(name)) continue;
+
         if (section !== 'peerDependencies' || !pkg.peerDependenciesMeta?.[name]?.optional) {
           this.errors.push(
             `${chalk.cyanBright(pkg.name)} is missing ${chalk.red(name)}\n  in ${section} at ${humanPath(packageRoot)}`
@@ -69,7 +86,13 @@ class Walker {
   }
 }
 
-function main() {
+async function main() {
+  let dir = await findRoot(process.cwd());
+  let monorepoInfo = await dir.tool.getPackages(dir.rootDir);
+  let root = monorepoInfo.rootPackage;
+
+  CUSTOM_SETINGS = (root?.packageJson as any).pnpm;
+
   if (!existsSync('package.json')) {
     process.stderr.write(`You must run this command in a project with a package.json file.`);
     process.exit(-1);
